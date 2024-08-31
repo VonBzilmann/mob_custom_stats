@@ -4,6 +4,7 @@ import me.bziluch.mobCustomStats.MobCustomStats;
 import me.bziluch.mobCustomStats.models.EntityEffectsModel;
 import me.bziluch.mobCustomStats.models.EntityEquipmentModel;
 import me.bziluch.mobCustomStats.models.EquipmentSlotType;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
@@ -23,6 +24,7 @@ public class MobStatModifierService {
 
     private static final Map<EntityType, EntityEquipmentModel> entitiesEquipment = new HashMap<>();
     private static final Map<EntityType, EntityEffectsModel> entitiesEffects = new HashMap<>();
+    private static int currentErrorCount = 0;
 
     public static void setStats(LivingEntity entity) {
         EntityType entityType = entity.getType();
@@ -50,9 +52,19 @@ public class MobStatModifierService {
 
                         if (effectSplit.length == 2) {
                             amplifier = Integer.valueOf(effectSplit[1]);
+                            if (amplifier <= 0 || amplifier > 255) {
+                                if (canSendErrorMessage()) {
+                                    sendErrorMessage(effectSplit[1] + " is not a valid effect level");
+                                    amplifier = 1;
+                                }
+                            }
                         }
 
                         entityEffectsModel.addItem(new PotionEffect(effectType, PotionEffect.INFINITE_DURATION, amplifier, true, false));
+                    } else {
+                        if (canSendErrorMessage()) {
+                            sendErrorMessage(effectSplit[0] + " is not a valid effect type");
+                        }
                     }
                 }
             }
@@ -73,11 +85,31 @@ public class MobStatModifierService {
 
                     String[] equipmentSplit = equipmentString.split("/");
                     if (equipmentSplit.length < 2) {
+                        if (canSendErrorMessage()) {
+                            sendErrorMessage(equipmentString + " is not a valid equipment string");
+                        }
                         continue;
                     }
 
-                    EquipmentSlotType slotType = EquipmentSlotType.valueOf(equipmentSplit[0]);
-                    Material material = Material.valueOf(equipmentSplit[1]);
+                    EquipmentSlotType slotType;
+                    try {
+                        slotType = EquipmentSlotType.valueOf(equipmentSplit[0]);
+                    } catch (IllegalArgumentException e) {
+                        if (canSendErrorMessage()) {
+                            sendErrorMessage(equipmentSplit[0] + " is not a valid slot type");
+                        }
+                        continue;
+                    }
+
+                    Material material;
+                    try {
+                        material = Material.valueOf(equipmentSplit[1]);
+                    } catch (IllegalArgumentException e) {
+                        if (canSendErrorMessage()) {
+                            sendErrorMessage(equipmentSplit[1] + " is not a valid item id");
+                        }
+                        continue;
+                    }
                     ItemStack itemStack = new ItemStack(material);
 
                     if (equipmentSplit.length > 2) {
@@ -87,11 +119,22 @@ public class MobStatModifierService {
                             int level = 1;
                             if (equipmentSplit.length >= (splitIndex + 1)) {
                                 level = Integer.parseInt(equipmentSplit[(splitIndex)]);
+                                if (level <= 0 || level > 255) {
+                                    if (canSendErrorMessage()) {
+                                        sendErrorMessage(equipmentSplit[(splitIndex)] + " is not a valid enchantment level");
+                                        level = 1;
+                                    }
+                                }
                             }
 
                             Enchantment enchantment = Enchantment.getByName(equipmentSplit[splitIndex - 1]);
                             if (enchantment != null) {
                                 itemStack.addEnchantment(enchantment, level);
+                            } else {
+                                if (canSendErrorMessage()) {
+                                    sendErrorMessage(equipmentSplit[(splitIndex - 1)] + " is not a valid enchantment name");
+                                    continue;
+                                }
                             }
                             splitIndex += 2;
                         }
@@ -104,7 +147,16 @@ public class MobStatModifierService {
         }
         entityEquipmentModel.equipEntity(entity);
 
+    }
 
+    private static boolean canSendErrorMessage() {
+        int maxErrorCount = 32;
+        return  currentErrorCount < maxErrorCount;
+    }
+
+    private static void sendErrorMessage(String errorText) {
+        System.out.println(ChatColor.DARK_RED + "[CustomMobStats] WARNING: " + errorText);
+        currentErrorCount += 1;
     }
 
 }

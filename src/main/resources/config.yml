@@ -1,0 +1,15 @@
+stats:
+#  zombie: # (entity type (id))
+#   health: 6 # (each point is half heart)
+#   effects:
+     # <EFFECT_ID>/<effect_level>
+#     - SPEED/5
+#     - JUMP_BOOST/3
+#   equipment:
+     # <SLOT_TYPE>/<ITEM_ID> or
+     # <SLOT_TYPE>/<ITEM_ID>/<ENCHANT_ID>/<enchant_level>
+#     - WEAPON/WOODEN_SWORD/SHARPNESS/2
+#     - HELMET/LEATHER_HELMET
+#     - CHESTPLATE/LEATHER_CHESTPLATE
+#     - LEGGINS/LEATHER_LEGGINGS
+#     - BOOTS/LEATHER_BOOTS
