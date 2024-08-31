@@ -4,7 +4,7 @@ public enum EquipmentSlotType {
     WEAPON,
     HELMET,
     CHESTPLATE,
-    LEGGINS,
+    LEGGINGS,
     BOOTS,
     LEFT_HAND
 }

@@ -28,7 +28,7 @@ public class EntityEquipmentModel {
         if (null != (itemStack = this.equipment.get(EquipmentSlotType.CHESTPLATE))) {
             entityEquipment.setChestplate(itemStack);
         }
-        if (null != (itemStack = this.equipment.get(EquipmentSlotType.LEGGINS))) {
+        if (null != (itemStack = this.equipment.get(EquipmentSlotType.LEGGINGS))) {
             entityEquipment.setLeggings(itemStack);
         }
         if (null != (itemStack = this.equipment.get(EquipmentSlotType.BOOTS))) {
