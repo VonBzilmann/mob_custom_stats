@@ -24,17 +24,37 @@ public class MobStatModifierService {
 
     private static final Map<EntityType, EntityEquipmentModel> entitiesEquipment = new HashMap<>();
     private static final Map<EntityType, EntityEffectsModel> entitiesEffects = new HashMap<>();
+    private static int maxErrorCount = 0;
     private static int currentErrorCount = 0;
 
     public static void setStats(LivingEntity entity) {
+
         EntityType entityType = entity.getType();
         String entityTypeString = entityType.toString().toLowerCase();
+
+        if (!configFile.contains("stats." + entityTypeString)) {
+            return;
+        }
+
+        if (maxErrorCount == 0) {
+            int maxErrorCountTemp = configFile.getInt("max_error_messages");
+            if (maxErrorCountTemp > 0) {
+                maxErrorCount = maxErrorCountTemp;
+            } else {
+                sendErrorMessage("Can't find count of max error messages - setting to default (64)");
+                maxErrorCount = 64;
+            }
+        }
 
         // Set health
         double health = configFile.getDouble("stats." + entityTypeString + ".health");
         if (health > 0) {
             entity.setMaxHealth(health);
             entity.setHealth(health);
+        } else {
+            if (canSendErrorMessage()) {
+                sendErrorMessage(health + " is not a valid health value");
+            }
         }
 
         // Set effects
@@ -150,12 +170,11 @@ public class MobStatModifierService {
     }
 
     private static boolean canSendErrorMessage() {
-        int maxErrorCount = 32;
         return  currentErrorCount < maxErrorCount;
     }
 
     private static void sendErrorMessage(String errorText) {
-        System.out.println(ChatColor.DARK_RED + "[CustomMobStats] WARNING: " + errorText);
+        MobCustomStats.getConsoleCommandSender().sendMessage(ChatColor.DARK_RED + "[MobCustomStats] WARNING: " + errorText);
         currentErrorCount += 1;
     }
 

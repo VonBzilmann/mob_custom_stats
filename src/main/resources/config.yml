@@ -1,3 +1,4 @@
+max_error_messages: 64
 stats:
 #  zombie: # (entity type (id))
 #   health: 6 # (each point is half heart)
