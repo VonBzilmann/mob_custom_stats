@@ -2,3 +2,9 @@ name: MobCustomStats
 version: '1.0-SNAPSHOT'
 main: me.bziluch.mobCustomStats.MobCustomStats
 api-version: '1.21'
+commands:
+  mobcustomstats:
+    description: View all commands related to Custom Mob Stats
+    usage: /<command>
+    aliases:
+      - mcs

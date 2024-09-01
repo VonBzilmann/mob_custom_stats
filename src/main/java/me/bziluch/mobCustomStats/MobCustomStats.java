@@ -1,5 +1,6 @@
 package me.bziluch.mobCustomStats;
 
+import me.bziluch.mobCustomStats.commands.MobCustomStatsCommand;
 import me.bziluch.mobCustomStats.listeners.CreatureSpawnEventListener;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -24,6 +25,8 @@ public final class MobCustomStats extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new CreatureSpawnEventListener(), this);
         consoleCommandSender = getServer().getConsoleSender();
+
+        getCommand("mobcustomstats").setExecutor(new MobCustomStatsCommand());
     }
 
     @Override
