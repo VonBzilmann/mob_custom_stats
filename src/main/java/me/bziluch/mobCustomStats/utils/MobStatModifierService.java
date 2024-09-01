@@ -4,7 +4,7 @@ import me.bziluch.mobCustomStats.MobCustomStats;
 import me.bziluch.mobCustomStats.models.EntityEffectsModel;
 import me.bziluch.mobCustomStats.models.EntityEquipmentModel;
 import me.bziluch.mobCustomStats.models.EquipmentSlotType;
-import org.bukkit.ChatColor;
+import me.bziluch.mobCustomStats.services.ErrorLoggerService;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
@@ -21,11 +21,10 @@ import java.util.Map;
 public class MobStatModifierService {
 
     private static final FileConfiguration configFile = MobCustomStats.getConfigFile();
+    private static final ErrorLoggerService logger = new ErrorLoggerService("max_error_messages", 64);
 
     private static final Map<EntityType, EntityEquipmentModel> entitiesEquipment = new HashMap<>();
     private static final Map<EntityType, EntityEffectsModel> entitiesEffects = new HashMap<>();
-    private static int maxErrorCount = 0;
-    private static int currentErrorCount = 0;
 
     public static void setStats(LivingEntity entity) {
 
@@ -36,25 +35,13 @@ public class MobStatModifierService {
             return;
         }
 
-        if (maxErrorCount == 0) {
-            int maxErrorCountTemp = configFile.getInt("max_error_messages");
-            if (maxErrorCountTemp > 0) {
-                maxErrorCount = maxErrorCountTemp;
-            } else {
-                sendErrorMessage("Can't find count of max error messages - setting to default (64)");
-                maxErrorCount = 64;
-            }
-        }
-
         // Set health
         double health = configFile.getDouble("stats." + entityTypeString + ".health");
         if (health > 0) {
             entity.setMaxHealth(health);
             entity.setHealth(health);
         } else {
-            if (canSendErrorMessage()) {
-                sendErrorMessage(health + " is not a valid health value");
-            }
+            logger.sendErrorMessage(health + " is not a valid health value");
         }
 
         // Set effects
@@ -73,18 +60,14 @@ public class MobStatModifierService {
                         if (effectSplit.length == 2) {
                             amplifier = Integer.valueOf(effectSplit[1]);
                             if (amplifier <= 0 || amplifier > 255) {
-                                if (canSendErrorMessage()) {
-                                    sendErrorMessage(effectSplit[1] + " is not a valid effect level");
-                                    amplifier = 1;
-                                }
+                                logger.sendErrorMessage(effectSplit[1] + " is not a valid effect level");
+                                amplifier = 1;
                             }
                         }
 
                         entityEffectsModel.addItem(new PotionEffect(effectType, PotionEffect.INFINITE_DURATION, amplifier, true, false));
                     } else {
-                        if (canSendErrorMessage()) {
-                            sendErrorMessage(effectSplit[0] + " is not a valid effect type");
-                        }
+                        logger.sendErrorMessage(effectSplit[0] + " is not a valid effect type");
                     }
                 }
             }
@@ -105,9 +88,7 @@ public class MobStatModifierService {
 
                     String[] equipmentSplit = equipmentString.split("/");
                     if (equipmentSplit.length < 2) {
-                        if (canSendErrorMessage()) {
-                            sendErrorMessage(equipmentString + " is not a valid equipment string");
-                        }
+                        logger.sendErrorMessage(equipmentString + " is not a valid equipment string");
                         continue;
                     }
 
@@ -115,9 +96,7 @@ public class MobStatModifierService {
                     try {
                         slotType = EquipmentSlotType.valueOf(equipmentSplit[0]);
                     } catch (IllegalArgumentException e) {
-                        if (canSendErrorMessage()) {
-                            sendErrorMessage(equipmentSplit[0] + " is not a valid slot type");
-                        }
+                        logger.sendErrorMessage(equipmentSplit[0] + " is not a valid slot type");
                         continue;
                     }
 
@@ -125,9 +104,7 @@ public class MobStatModifierService {
                     try {
                         material = Material.valueOf(equipmentSplit[1]);
                     } catch (IllegalArgumentException e) {
-                        if (canSendErrorMessage()) {
-                            sendErrorMessage(equipmentSplit[1] + " is not a valid item id");
-                        }
+                        logger.sendErrorMessage(equipmentSplit[1] + " is not a valid item id");
                         continue;
                     }
                     ItemStack itemStack = new ItemStack(material);
@@ -140,10 +117,8 @@ public class MobStatModifierService {
                             if (equipmentSplit.length >= (splitIndex + 1)) {
                                 level = Integer.parseInt(equipmentSplit[(splitIndex)]);
                                 if (level <= 0 || level > 255) {
-                                    if (canSendErrorMessage()) {
-                                        sendErrorMessage(equipmentSplit[(splitIndex)] + " is not a valid enchantment level");
-                                        level = 1;
-                                    }
+                                    logger.sendErrorMessage(equipmentSplit[(splitIndex)] + " is not a valid enchantment level");
+                                    level = 1;
                                 }
                             }
 
@@ -151,10 +126,8 @@ public class MobStatModifierService {
                             if (enchantment != null) {
                                 itemStack.addEnchantment(enchantment, level);
                             } else {
-                                if (canSendErrorMessage()) {
-                                    sendErrorMessage(equipmentSplit[(splitIndex - 1)] + " is not a valid enchantment name");
-                                    continue;
-                                }
+                                logger.sendErrorMessage(equipmentSplit[(splitIndex - 1)] + " is not a valid enchantment name");
+                                continue;
                             }
                             splitIndex += 2;
                         }
@@ -167,15 +140,6 @@ public class MobStatModifierService {
         }
         entityEquipmentModel.equipEntity(entity);
 
-    }
-
-    private static boolean canSendErrorMessage() {
-        return  currentErrorCount < maxErrorCount;
-    }
-
-    private static void sendErrorMessage(String errorText) {
-        MobCustomStats.getConsoleCommandSender().sendMessage(ChatColor.DARK_RED + "[MobCustomStats] WARNING: " + errorText);
-        currentErrorCount += 1;
     }
 
 }
