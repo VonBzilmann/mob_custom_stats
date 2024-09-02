@@ -19,11 +19,16 @@ public class MobCustomStatsCommand implements CommandExecutor {
     private static List<String> allowedKeys;
     private static FileConfiguration configFile = MobCustomStats.getConfigFile();
 
-    private static MobCustomStats plugin = MobCustomStats.getPlugin();
+    private static final MobCustomStats plugin = MobCustomStats.getPlugin();
 
     private static final String KEY_HEALTH = "health";
     private static final String KEY_EFFECTS = "effects";
     private static final String KEY_EQ = "equipment";
+
+    private static final String COMMAND_INFO = "info";
+    private static final String COMMAND_SET = "set";
+    private static final String COMMAND_VIEW = "view";
+    private static final String COMMAND_RELOAD = "reload";
 
     public MobCustomStatsCommand() {
         String[] keys = {KEY_HEALTH, KEY_EFFECTS, KEY_EQ};
@@ -40,16 +45,16 @@ public class MobCustomStatsCommand implements CommandExecutor {
 
         if (strings.length > 0) {
             switch (strings[0]) {
-                case "view-stat":
+                case COMMAND_VIEW:
                     this.viewStat(commandSender, strings);
                     break;
-                case "set-stat":
+                case COMMAND_SET:
                     this.setStat(commandSender, strings);
                     break;
-                case "config-reload":
+                case COMMAND_RELOAD:
                     this.reloadConfig(commandSender);
                     break;
-                case "info":
+                case COMMAND_INFO:
                     this.info(commandSender);
                     break;
                 default:
@@ -66,10 +71,10 @@ public class MobCustomStatsCommand implements CommandExecutor {
     private void info(CommandSender commandSender) {
         if (commandSender instanceof Player) {
             commandSender.sendMessage(ChatColor.GOLD + "===== List of commands ====="
-                + "\n /" + commandName + " info - view list of commands"
-                + "\n /" + commandName + " config-reload - reload config.yml"
-                + "\n /" + commandName + " set-stat <key> <value> - set stat value (for array values, use | (pipe) separator)"
-                + "\n /" + commandName + " view-stat <key> - view stat value"
+                + "\n /" + commandName + " " + COMMAND_INFO + " - view list of commands"
+                + "\n /" + commandName + " " + COMMAND_RELOAD + " - reload config.yml"
+                + "\n /" + commandName + " " + COMMAND_SET + " <key> <value> - set stat value (for array values, use | (pipe) separator)"
+                + "\n /" + commandName + " " + COMMAND_VIEW + " <key> - view stat value"
             );
         }
     }
@@ -77,7 +82,7 @@ public class MobCustomStatsCommand implements CommandExecutor {
     private void viewStat(CommandSender commandSender, String[] strings)
     {
         if (strings.length != 2) {
-            commandSender.sendMessage(ChatColor.GOLD + "Usage: /" + commandName + " view-stat <key>");
+            commandSender.sendMessage(ChatColor.GOLD + "Usage: /" + commandName + " " + COMMAND_VIEW + " <key>");
             return;
         }
 
@@ -92,23 +97,18 @@ public class MobCustomStatsCommand implements CommandExecutor {
             return;
         }
 
-        String keyValue = "";
-        switch (splitKey[1]) {
-            case KEY_HEALTH:
-                keyValue = configFile.getString(fullKeyIndex);
-                break;
-            case KEY_EFFECTS:
-            case KEY_EQ:
-                keyValue = "\n - " + String.join("\n - ", configFile.getStringList(fullKeyIndex));
-                break;
-        }
+        String keyValue = switch (splitKey[1]) {
+            case KEY_HEALTH -> configFile.getString(fullKeyIndex);
+            case KEY_EFFECTS, KEY_EQ -> "\n - " + String.join("\n - ", configFile.getStringList(fullKeyIndex));
+            default -> "";
+        };
         commandSender.sendMessage(ChatColor.GREEN + fullKeyIndex + " contains value: "+ ChatColor.AQUA + keyValue);
     }
 
     private void setStat(CommandSender commandSender, String[] strings)
     {
         if (strings.length != 3) {
-            commandSender.sendMessage(ChatColor.GOLD + "Usage: /" + commandName + " set-stat <key> <value>");
+            commandSender.sendMessage(ChatColor.GOLD + "Usage: /" + commandName + " " + COMMAND_SET + " <key> <value>");
             return;
         }
 
