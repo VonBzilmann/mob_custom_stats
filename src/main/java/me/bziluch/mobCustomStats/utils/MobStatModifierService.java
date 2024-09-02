@@ -5,6 +5,7 @@ import me.bziluch.mobCustomStats.models.EntityEffectsModel;
 import me.bziluch.mobCustomStats.models.EntityEquipmentModel;
 import me.bziluch.mobCustomStats.models.EquipmentSlotType;
 import me.bziluch.mobCustomStats.services.ErrorLoggerService;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
@@ -20,11 +21,19 @@ import java.util.Map;
 
 public class MobStatModifierService {
 
-    private static final FileConfiguration configFile = MobCustomStats.getConfigFile();
+    private static FileConfiguration configFile = MobCustomStats.getConfigFile();
     private static final ErrorLoggerService logger = new ErrorLoggerService("max_error_messages", 64);
 
     private static final Map<EntityType, EntityEquipmentModel> entitiesEquipment = new HashMap<>();
     private static final Map<EntityType, EntityEffectsModel> entitiesEffects = new HashMap<>();
+
+    private static final MobCustomStats plugin = MobCustomStats.getPlugin();
+
+    public static void clearMappings() {
+        configFile = plugin.getConfig();
+        entitiesEquipment.clear();
+        entitiesEffects.clear();
+    }
 
     public static void setStats(LivingEntity entity) {
 
@@ -50,6 +59,15 @@ public class MobStatModifierService {
             entityEffectsModel = new EntityEffectsModel();
 
             List<String> effectStringList = configFile.getStringList("stats." + entityTypeString + ".effects");
+            Bukkit.broadcastMessage(String.join(" | ", effectStringList));
+            Bukkit.broadcastMessage(configFile.getString("stats." + entityTypeString + ".effects"));
+            try {
+                Bukkit.broadcastMessage(configFile.get("stats." + entityTypeString + ".effects").toString());
+            } catch (Exception e) {
+                Bukkit.broadcastMessage("-invalid-");
+            }
+
+
             if (effectStringList != null) {
                 for (String effectString : effectStringList) {
                     String[] effectSplit = effectString.split("/");

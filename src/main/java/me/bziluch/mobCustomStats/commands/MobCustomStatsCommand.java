@@ -1,6 +1,7 @@
 package me.bziluch.mobCustomStats.commands;
 
 import me.bziluch.mobCustomStats.MobCustomStats;
+import me.bziluch.mobCustomStats.utils.MobStatModifierService;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -16,7 +17,9 @@ public class MobCustomStatsCommand implements CommandExecutor {
     private static final String commandName = "mcs";
     private static final String prefix = "stats.";
     private static List<String> allowedKeys;
-    private static final FileConfiguration configFile = MobCustomStats.getConfigFile();
+    private static FileConfiguration configFile = MobCustomStats.getConfigFile();
+
+    private static MobCustomStats plugin = MobCustomStats.getPlugin();
 
     private static final String KEY_HEALTH = "health";
     private static final String KEY_EFFECTS = "effects";
@@ -126,6 +129,13 @@ public class MobCustomStatsCommand implements CommandExecutor {
         }
         plugin.saveConfig();
         commandSender.sendMessage(ChatColor.GREEN + "Setting saved!");
+    }
+
+    private void reloadConfig(CommandSender commandSender) {
+        plugin.reloadConfig();
+        MobStatModifierService.clearMappings();
+        configFile = plugin.getConfig();
+        commandSender.sendMessage(ChatColor.GREEN + "Config has been reloaded!");
     }
 
 
