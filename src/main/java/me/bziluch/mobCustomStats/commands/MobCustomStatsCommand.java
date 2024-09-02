@@ -39,6 +39,18 @@ public class MobCustomStatsCommand implements CommandExecutor {
             switch (strings[0]) {
                 case "view-stat":
                     this.viewStat(commandSender, strings);
+                    break;
+                case "set-stat":
+                    this.setStat(commandSender, strings);
+                    break;
+                case "config-reload":
+                    this.reloadConfig(commandSender);
+                    break;
+                case "info":
+                    this.info(commandSender);
+                    break;
+                default:
+                    commandSender.sendMessage(ChatColor.YELLOW + "Unknown command!");
             }
             return true;
         }
@@ -50,10 +62,12 @@ public class MobCustomStatsCommand implements CommandExecutor {
     // View subcommands
     private void info(CommandSender commandSender) {
         if (commandSender instanceof Player) {
-            commandSender.sendMessage(ChatColor.GOLD + "/" + commandName + " info - view list of commands");
-            commandSender.sendMessage(ChatColor.GOLD + "/" + commandName + " config-reload - reload config.yml");
-            commandSender.sendMessage(ChatColor.GOLD + "/" + commandName + " set-stat <key> <value> - set stat value (for array values, use | (pipe) separator)");
-            commandSender.sendMessage(ChatColor.GOLD + "/" + commandName + " view-stat <key> - view stat value");
+            commandSender.sendMessage(ChatColor.GOLD + "===== List of commands ====="
+                + "\n /" + commandName + " info - view list of commands"
+                + "\n /" + commandName + " config-reload - reload config.yml"
+                + "\n /" + commandName + " set-stat <key> <value> - set stat value (for array values, use | (pipe) separator)"
+                + "\n /" + commandName + " view-stat <key> - view stat value"
+            );
         }
     }
 
@@ -85,8 +99,7 @@ public class MobCustomStatsCommand implements CommandExecutor {
                 keyValue = "\n - " + String.join("\n - ", configFile.getStringList(fullKeyIndex));
                 break;
         }
-        commandSender.sendMessage(ChatColor.GREEN + fullKeyIndex + " contains value:");
-        commandSender.sendMessage(ChatColor.AQUA + keyValue);
+        commandSender.sendMessage(ChatColor.GREEN + fullKeyIndex + " contains value: "+ ChatColor.AQUA + keyValue);
     }
 
     private void setStat(CommandSender commandSender, String[] strings)
@@ -104,15 +117,15 @@ public class MobCustomStatsCommand implements CommandExecutor {
         String fullKeyIndex = prefix + strings[1];
         switch (splitKey[1]) {
             case KEY_HEALTH:
-                configFile.set(fullKeyIndex, splitKey[2]);
+                configFile.set(fullKeyIndex, Integer.parseInt(strings[2]));
                 break;
             case KEY_EFFECTS:
             case KEY_EQ:
-                configFile.set(fullKeyIndex, splitKey[2].split("\\|"));
+                configFile.set(fullKeyIndex, strings[2].split("\\|"));
                 break;
         }
-        configFile.save();
-
+        plugin.saveConfig();
+        commandSender.sendMessage(ChatColor.GREEN + "Setting saved!");
     }
 
 

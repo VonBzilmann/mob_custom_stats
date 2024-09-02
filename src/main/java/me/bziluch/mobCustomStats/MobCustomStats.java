@@ -12,9 +12,11 @@ public final class MobCustomStats extends JavaPlugin {
 
     private static FileConfiguration configFile;
     private static ConsoleCommandSender consoleCommandSender;
+    public static MobCustomStats plugin;
 
     @Override
     public void onEnable() {
+        plugin = this;
 
         // Setup config file
         File file = new File(getDataFolder(), "config.yml");
@@ -40,6 +42,14 @@ public final class MobCustomStats extends JavaPlugin {
 
     public static ConsoleCommandSender getConsoleCommandSender() {
         return consoleCommandSender;
+    }
+
+    public void saveConfigFile() {
+        this.saveConfig();
+    }
+
+    public static MobCustomStats getPlugin() {
+        return plugin;
     }
 
 }
