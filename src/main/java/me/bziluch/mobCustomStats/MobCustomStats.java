@@ -3,6 +3,7 @@ package me.bziluch.mobCustomStats;
 import me.bziluch.mobCustomStats.commands.MobCustomStatsCommand;
 import me.bziluch.mobCustomStats.filedata.McsConfig;
 import me.bziluch.mobCustomStats.listeners.CreatureSpawnEventListener;
+import me.bziluch.mobCustomStats.services.ErrorLoggerService;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -15,6 +16,7 @@ public final class MobCustomStats extends JavaPlugin {
     private static FileConfiguration configFile;
     private static ConsoleCommandSender consoleCommandSender;
     public static MobCustomStats plugin;
+    private static final ErrorLoggerService logger = new ErrorLoggerService("max_error_messages", 64);
 
     @Override
     public void onEnable() {
@@ -50,6 +52,10 @@ public final class MobCustomStats extends JavaPlugin {
 
     public static MobCustomStats getPlugin() {
         return plugin;
+    }
+
+    public static ErrorLoggerService getErrorLogger() {
+        return logger;
     }
 
 }
