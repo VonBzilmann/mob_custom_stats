@@ -1,6 +1,7 @@
 package me.bziluch.mobCustomStats.utils;
 
 import me.bziluch.mobCustomStats.MobCustomStats;
+import me.bziluch.mobCustomStats.managers.ErrorLoggerManager;
 import me.bziluch.mobCustomStats.models.EntityEffectsModel;
 import me.bziluch.mobCustomStats.models.EntityEquipmentModel;
 import me.bziluch.mobCustomStats.models.EquipmentSlotType;
@@ -21,7 +22,7 @@ import java.util.Map;
 public class MobStatModifierService {
 
     private static FileConfiguration configFile = MobCustomStats.getConfigFile();
-    private static final ErrorLoggerService logger = new ErrorLoggerService("max_error_messages", 64);
+    private static final ErrorLoggerService logger = ErrorLoggerManager.getLogger();
 
     private static final Map<EntityType, EntityEquipmentModel> entitiesEquipment = new HashMap<>();
     private static final Map<EntityType, EntityEffectsModel> entitiesEffects = new HashMap<>();

@@ -1,6 +1,7 @@
 package me.bziluch.mobCustomStats.models;
 
 import me.bziluch.mobCustomStats.MobCustomStats;
+import me.bziluch.mobCustomStats.managers.ErrorLoggerManager;
 import me.bziluch.mobCustomStats.services.ErrorLoggerService;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -18,7 +19,7 @@ public class ConfigItemStack extends ItemStack {
     public static final String keyLore = "lore";
     public static final String keyEnchants = "enchants";
 
-    private static final ErrorLoggerService logger = MobCustomStats.getErrorLogger();
+    private static final ErrorLoggerService logger = ErrorLoggerManager.getLogger();
 
     public ConfigItemStack(ConfigurationSection section, String parentKey, String path) {
 
