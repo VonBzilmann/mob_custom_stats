@@ -8,13 +8,13 @@ import java.util.List;
 public class EntityDropsModel {
 
     private boolean overwriteDefaults = false;
-    private final List<ItemStack> drops = new ArrayList<>();
+    private final List<ConfigItemStack> drops = new ArrayList<>();
 
     public void setOverwriteDefaults(boolean overwriteDefaults) {
         this.overwriteDefaults = overwriteDefaults;
     }
 
-    public void addItem(ItemStack itemStack) {
+    public void addItem(ConfigItemStack itemStack) {
         this.drops.add(itemStack);
     }
 
@@ -23,6 +23,8 @@ public class EntityDropsModel {
         if (this.overwriteDefaults) {
             dropList.clear();
         }
+
+        //TODO: advanced mechanics here (with drop rate determination, drop amount etc.)
         dropList.addAll(this.drops);
     }
 }
